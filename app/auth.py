@@ -1,7 +1,7 @@
 import datetime
 from typing import Optional
+import bcrypt
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -11,15 +11,17 @@ from app.config import settings
 from app.database import get_db
 from app.models import User
 
-# Password Hashing Setup
-# Deprecation warnings in python 3.13 for passlib can be ignored, bcrypt is correctly imported
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
+# Password Hashing Setup using bcrypt directly (passlib is abandoned and incompatible with bcrypt 5.x)
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    password_bytes = password.encode('utf-8')
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(password_bytes, salt)
+    return hashed.decode('utf-8')
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    password_bytes = plain_password.encode('utf-8')
+    hashed_bytes = hashed_password.encode('utf-8')
+    return bcrypt.checkpw(password_bytes, hashed_bytes)
 
 
 # JWT Helpers
