@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # 1. PostgreSQL Database Service
+  postgres:
+    image: postgres:15-alpine
+    container_name: fechat_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: chat
+    ports:
+      - "5434:5432" # Maps internal port 5432 to host port 5434 matching local dev settings
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d chat"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 2. FastAPI + Socket.IO Backend Service
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fechat_backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=postgresql+psycopg://postgres:1234@postgres:5432/chat # Connects internally inside the docker network
+      - JWT_SECRET=dev-secret-change-me-in-production-1234567890
+      - CORS_ORIGINS=["http://localhost:3000","http://localhost:5173","http://127.0.0.1:3000","http://127.0.0.1:5173"]
+    volumes:
+      - uploads_data:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  uploads_data:
