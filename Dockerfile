@@ -35,9 +35,8 @@ COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 ENV PYTHONUNBUFFERED=1
 
-# Copy application files
+# Copy application files (env vars are injected via docker-compose.yml)
 COPY app /app/app
-COPY .env /app/.env
 
 # Create uploads folder and set permissions
 RUN mkdir -p /app/uploads
