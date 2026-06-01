@@ -15,7 +15,7 @@ Pekerjaan ini dibuat untuk memenuhi projek Tugas Akhir (Tubes) dengan judul:
 - **Dukungan Multi-Database (SQLite & PostgreSQL)**: Terkonfigurasi untuk berjalan dengan SQLite pada proses development lokal, dan beralih ke PostgreSQL (misal AWS RDS) untuk deployment production hanya dengan mengganti `DATABASE_URL`.
 - **Auto-Migration & Database Seeding**: Skema tabel otomatis terbentuk pada saat startup awal dan database otomatis diisi (*seeded*) dengan user testing bawaan (`ada-77`, `bob-99`, dsb.) agar integrasi dengan frontend instan tanpa setup manual.
 - **Dockerized & Orchestrated**: Dilengkapi `Dockerfile` multi-stage yang dioptimalkan serta `docker-compose.yml` untuk menjalankan aplikasi beserta database PostgreSQL dalam satu perintah.
-- **CI/CD Pipeline**: Dilengkapi file workflow GitHub Actions (`.github/workflows/docker-be.yml`) untuk build otomatis dan publish image ke Docker Hub.
+- **CI/CD Pipeline**: Dilengkapi file workflow GitHub Actions (`.github/workflows/docker-be.yml`) untuk build otomatis dan publish image ke Amazon ECR.
 
 ---
 
@@ -164,18 +164,19 @@ Ketika client terhubung menggunakan `socket.io-client`:
 
 ---
 
-## 🛠️ Panduan CI/CD dengan GitHub Actions
+## 🛠️ Panduan CI/CD dengan GitHub Actions ke AWS ECR
 
-File `.github/workflows/docker-be.yml` mengotomatisasi proses deployment ke Docker Hub ketika ada pembaruan pada branch `main` atau `master`.
+File `.github/workflows/docker-be.yml` mengotomatisasi proses deployment ke **Amazon ECR (Elastic Container Registry)** ketika ada pembaruan pada branch `main` atau `master`.
 
 ### Konfigurasi Repository Secrets di GitHub
-Agar pipeline berjalan dengan lancar, Anda harus menambahkan Secrets berikut pada repository GitHub Anda:
+Agar pipeline CI/CD AWS ECR berjalan dengan lancar, Anda harus menambahkan Secrets berikut pada repository GitHub Anda:
 1. Masuk ke **Settings > Secrets and variables > Actions** pada repo GitHub Anda.
 2. Klik **New repository secret** dan tambahkan:
-   - `DOCKERHUB_USERNAME`: Username Docker Hub Anda.
-   - `DOCKERHUB_TOKEN`: Personal Access Token Docker Hub Anda (Buat di *Docker Hub Account Settings > Security > New Access Token*).
+   - `AWS_ACCESS_KEY_ID`: Access Key ID dari akun AWS IAM User Anda.
+   - `AWS_SECRET_ACCESS_KEY`: Secret Access Key dari akun AWS IAM User Anda.
 
-Saat Anda melakukan `git push` ke branch `main`, GitHub Actions akan otomatis membuat image Docker terbaru dengan tag `:latest` dan `:commit-sha`, lalu mempublikasikannya ke Docker Hub registry Anda.
+Saat Anda melakukan `git push` ke branch `main`, GitHub Actions akan otomatis melakukan konfigurasi credentials AWS, login ke Amazon ECR, membuat image Docker terbaru dengan tag `:latest` dan `:commit-sha`, lalu mempublikasikannya langsung ke ECR registry Anda:
+`058264530865.dkr.ecr.us-east-1.amazonaws.com/fechat-be`
 
 ---
 
