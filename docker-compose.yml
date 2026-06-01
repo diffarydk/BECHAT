@@ -32,7 +32,7 @@ services:
     environment:
       - DATABASE_URL=postgresql+psycopg://postgres:1234@postgres:5432/chat # Connects internally inside the docker network
       - JWT_SECRET=dev-secret-change-me-in-production-1234567890
-      - CORS_ORIGINS=["http://localhost:3000","http://localhost:5173","http://127.0.0.1:3000","http://127.0.0.1:5173","http://13.223.81.189","https://tubescc-diffary-meidi.duckdns.org"]
+      - CORS_ORIGINS=["http://localhost:3000","http://localhost:5173","http://127.0.0.1:3000","http://127.0.0.1:5173","http://13.223.81.189","http://tubescc-diffary-meidi.duckdns.org","https://tubescc-diffary-meidi.duckdns.org"]
     volumes:
       - uploads_data:/app/uploads
     depends_on:
