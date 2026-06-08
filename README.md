@@ -86,9 +86,10 @@ CORS_ORIGINS=["http://localhost:3000","http://localhost:5173","http://127.0.0.1:
 > Sistem akan otomatis membuat file `app.db` di root dan memigrasikan tabelnya.
 
 ### Langkah 3: Menjalankan Server Lokal
-Jalankan server menggunakan Uvicorn:
+Jalankan server menggunakan launcher proyek (launcher ini juga memilih event loop
+yang kompatibel dengan koneksi async PostgreSQL di Windows):
 ```powershell
-python -m uvicorn app.main:sio_asgi_app --reload --port 5000
+python -m app.server --reload --port 5000
 ```
 Server akan berjalan di:
 - REST API Base URL: `http://localhost:5000/api`
